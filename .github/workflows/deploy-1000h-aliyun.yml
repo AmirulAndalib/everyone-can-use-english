@@ -37,13 +37,17 @@ jobs:
 
       - name: Write Aliyun OSS Config
         run: |
-          cat <<EOF > 1000-hours/.vitepress/config.aliyun.js
+          cat <<EOF > 1000-hours/.vitepress/config.js
           // Aliyun OSS 配置
           export default {
             base: "/1000-hours/",
             transformHtml: (code, id, html) => {
               // 使用正则匹配 <span data-audio-*> 并替换路径
-              return html.content.replace(/(<span[^>]*\s)data-audio-([\w-]+)="\/audios\/(.*?)"/g, (match, before, key, value) => {
+              let content = html.content.replace(/(<span[^>]*\s)data-audio-([\w-]+)="\/audios\/(.*?)"/g, (match, before, key, value) => {
+                return \`\${before}data-audio-\${key}="/1000-hours/audios/\${value}"\`
+              })
+
+              return content.replace(/(<span[^>]*\s)data-audio-([\w-]+)="\/audios\/(.*?)"/g, (match, before, key, value) => {
                 return \`\${before}data-audio-\${key}="/1000-hours/audios/\${value}"\`
               })
             }
