@@ -35,8 +35,20 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Set Base Path
-        run: sed -i 's/defineConfig({/defineConfig({"base":"\/1000-hours\/",/g' 1000-hours/.vitepress/config.mts  
+      - name: Write Aliyun OSS Config
+        run: |
+          cat <<EOL > 1000-hours/.vitepress/config.aliyun.js
+          // Aliyun OSS 配置
+          export default {
+            base: "/1000-hours/",
+            transformHtml: (code, id, html) => {
+              // 使用正则匹配 <span data-audio-*> 并替换路径
+              return html.content.replace(/(<span[^>]*\s)data-audio-([\w-]+)="\/audios\/(.*?)"/g, (match, before, key, value) => {
+                return `${before}data-audio-${key}="/1000-hours/audios/${value}"`
+              })
+            }
+          }
+          EOL
 
       - name: Build
         run: yarn docs:build
